@@ -3,7 +3,7 @@ import nltk
 nltk.download('punkt')
 
 import streamlit as st
-from analytics_dashboard import pandas_ai, download_data
+from analytics_dashboard import pandas_ai
 from streamlit_antd_components import menu, MenuItem
 import streamlit_antd_components as sac
 from main_bot import basebot_memory, basebot_qa_memory, clear_session_states, search_bot, basebot, basebot_qa
