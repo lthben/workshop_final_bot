@@ -63,12 +63,9 @@ def pandas_ai(user_id, sch_id, profile):
 	openai.api_key = return_api_key()
 	os.environ["OPENAI_API_KEY"] = return_api_key()
 	uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-<<<<<<< HEAD
-=======
 	if "api_key" not in st.session_state:
 		st.session_state.api_key = return_api_key()
 	st.write("API key: ", st.session_state.api_key)
->>>>>>> upstream/main
 	st.session_state.prompt_history = []
 	st.session_state.df = None
 
