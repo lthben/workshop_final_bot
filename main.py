@@ -1,7 +1,10 @@
 #No need SQLite
 import nltk
+<<<<<<< HEAD
 nltk.download('punkt')
 
+=======
+>>>>>>> upstream/main
 import streamlit as st
 from analytics_dashboard import pandas_ai, download_data
 from streamlit_antd_components import menu, MenuItem
@@ -63,8 +66,18 @@ import configparser
 import ast
 from machine import upload_csv, plot_prices, prepare_data_and_train, plot_predictions, load_teachable_machines
 from chatbot import call_api, rule_based
-from agent import agent_bot, agent_management
+from agent import agent_bot, agent_management, dalle_image_generator
 from prototype_application import my_first_app, prototype_settings, my_first_app_advance
+
+def download_nltk_data_if_absent(package_name):
+    try:
+        # Try loading the package to see if it exists
+        nltk.data.find('tokenizers/' + package_name)
+    except LookupError:
+        # If the package doesn't exist, download it
+        nltk.download(package_name)
+
+download_nltk_data_if_absent('punkt')
 
 class ConfigHandler:
 	def __init__(self):
@@ -131,8 +144,6 @@ def main():
 		st.title(st.session_state.title_page)
 		sac.divider(label='ITD Workshop Framework', icon='house', align='center', direction='horizontal', dashed=False, bold=False)
 		
-		if "api_key" not in st.session_state:
-			st.session_state.api_key = ""
 
 		if "option" not in st.session_state:
 			st.session_state.option = False
@@ -185,10 +196,26 @@ def main():
 		if "func_options" not in st.session_state:
 			st.session_state.func_options = {}
 			initialize_session_state(MENU_FUNCS, True)
-
 		if "tools" not in st.session_state:
 			st.session_state.tools = []
-		
+		if "form_title" not in st.session_state:
+			st.session_state.form_title = "Message Generator"
+		if "question_1" not in st.session_state:
+			st.session_state.question_1 = "Name"
+		if "question_2" not in st.session_state:
+			st.session_state.question_2 = "Occupation"
+		if "question_3" not in st.session_state:
+			st.session_state.question_3 = "Subject"
+		if "question_4" not in st.session_state:
+			st.session_state.question_4 = "Message"
+		if "question_5" not in st.session_state:
+			st.session_state.question_5 = "Number of words"
+		# if "my_form_template" not in st.session_state:
+		# 	st.session_state.my_form_template = "To help you write your email, You may refer to this resources to answer your query,{resource},{source}"
+		# if "my_app_template" not in st.session_state:
+		# 	st.session_state.my_app_template = "Pretend you are a {q2}, your name is {q1}, I want you to write an email on {q4} on the subject {q3} , the number of words is {q5}"
+		# if "my_app_template_advance" not in st.session_state:
+		# 	st.session_state.my_app_template_advance = "Pretend you are a helpful assistant, Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Search Result: {resource} {source}. History of conversation: {mem}.You must quote the source of the Search Result if you are using the search result as part of the answer"
 		
 		create_dbs()
 		initialise_admin_account()
@@ -230,7 +257,6 @@ def main():
 						sac.MenuItem('Chatbot Management', icon='wrench', disabled=is_function_disabled('AI Chatbot')),
 						sac.MenuItem('Agent Chatbot', icon='chat-square-dots', disabled=is_function_disabled('Agent Chatbot')),
 						sac.MenuItem('Agent Management', icon='wrench', disabled=is_function_disabled('Agent Management')),
-						sac.MenuItem('Data Management', icon='database-fill-up',disabled=is_function_disabled('Data Management')),
 					]),
 					sac.MenuItem('Knowledge Base Tools', icon='book', children=[
 						sac.MenuItem('Files Management', icon='file-arrow-up', disabled=is_function_disabled('Files management')),
@@ -238,7 +264,7 @@ def main():
 					]),
 					sac.MenuItem('GenAI Application', icon='book', children=[
 						sac.MenuItem('AI Analytics', icon='chat-square-dots', disabled=is_function_disabled('AI Analytics')),
-						#sac.MenuItem('Audio Analytics', icon='file-arrow-up', disabled=is_function_disabled('Audio Analytics')),
+						sac.MenuItem('Image Generator', icon='camera', disabled=is_function_disabled('Image Generator')),
 						sac.MenuItem('Knowledge Map Generator', icon='database-fill-up',disabled=is_function_disabled('Knowledge Map Generator')),
 					]),
 					sac.MenuItem('Organisation Tools', icon='buildings', children=[
@@ -291,6 +317,15 @@ def main():
 			st.subheader(f":green[{st.session_state.option}]")
 			prototype_settings()
 			pass
+		
+		elif st.session_state.option == 'Image Generator':
+			st.subheader(f":green[{st.session_state.option}]")
+			query = st.text_input("Enter a image generated prompt", value="A picture of a cat")
+			if st.button("Generate Image"):
+				url = dalle_image_generator(query)
+				if url:
+					st.image(url)
+				pass
 
 		elif st.session_state.option == 'Machine Learning':
 			
@@ -322,8 +357,7 @@ def main():
 			if st.session_state.tools == []:
 				st.warning("Please set your tool under Agent Management")
 			else:
-				if st.session_state.memoryless:
-					agent_bot()
+				agent_bot()
 		elif st.session_state.option == 'Agent Management':
 			agent_management()
 
@@ -503,24 +537,6 @@ def main():
 						if syntax:
 							output_mermaid_diagram(syntax)
 						
-
-		# elif st.session_state.option == "Audio Analytics":
-		# 	st.subheader(f":green[{st.session_state.option}]") 
-		# 	# Create form
-		# 	subject = st.text_input("Subject:")
-		# 	topic = st.text_input("Topic:")
-		# 	assessment_type = st.selectbox("Type of Assessment:", ["Oral Assessment", "Content Assessment", "Transcribing No Assessment"])
-		# 	result = record_myself()
-		# 	if result is not None:
-		# 		transcript, language = result
-		# 		if assessment_type == "Transcribing No Assessment":
-		# 			st.write(f"Transcript: {transcript}")
-		# 			st.session_state.msg.append({"role": "assistant", "content": transcript})
-		# 		else:
-		# 			if subject and topic :
-		# 				assessment_prompt(transcript, assessment_type, subject, topic, language)
-		# 			else:
-		# 				st.warning("Please fill in all the fields in the oral submission form")
 						
 		
 		elif st.session_state.option == "Profile Settings":
