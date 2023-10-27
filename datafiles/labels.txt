@@ -1,2 +1,2 @@
-0 specs case
-1 remote
+0 pen
+1 post-it

@@ -1,4 +1,6 @@
 import streamlit as st
+import openai
+from authenticate import return_api_key
 from langchain.chat_models import ChatOpenAI
 import pandas as pd
 from pandasai import SmartDataframe
@@ -54,11 +56,11 @@ def download_data(user_id, sch_id, profile):
 def pandas_ai(user_id, sch_id, profile):
 
 	# Upload CSV file using st.file_uploader
+	openai.api_key = return_api_key()
+	os.environ["OPENAI_API_KEY"] = return_api_key()
 	uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-	if "openai_key" not in st.session_state:
-		st.session_state.openai_key = st.session_state.api_key
-		st.session_state.prompt_history = []
-		st.session_state.df = None
+	st.session_state.prompt_history = []
+	st.session_state.df = None
 
 	if uploaded_file is not None:
 		try:

@@ -1,4 +1,7 @@
 #No need SQLite
+import nltk
+nltk.download('punkt')
+
 import streamlit as st
 from analytics_dashboard import pandas_ai, download_data
 from streamlit_antd_components import menu, MenuItem
